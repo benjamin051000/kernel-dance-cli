@@ -2,6 +2,7 @@ import json
 import sys
 
 from selenium import webdriver
+from selenium.common import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,10 +17,14 @@ def scrape_kernel_dance(commit: str) -> str:
         driver.get(url)
 
         # Wait for body class to change from 'loading' to 'done' or 'error'
-        WebDriverWait(driver, 10).until(
-            lambda d: d.find_element(By.TAG_NAME, "body").get_attribute("class")
-            in ["done", "error"]
-        )
+        try:
+            WebDriverWait(driver, 10).until(
+                lambda d: d.find_element(By.TAG_NAME, "body").get_attribute("class")
+                in ["done", "error"]
+            )
+        except TimeoutException:
+            print(f"Error: Timed out while trying to access {url}.", file=sys.stderr)
+            sys.exit(1)
 
         output = driver.find_element(By.ID, "output")
         result = output.text
