@@ -13,9 +13,7 @@ def scrape_kernel_dance(commit):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
-    driver = webdriver.Chrome(options=options)
-
-    try:
+    with webdriver.Chrome(options=options) as driver:
         url = f"https://kernel.dance/#{commit}"
         driver.get(url)
 
@@ -40,9 +38,6 @@ def scrape_kernel_dance(commit):
             print(json.dumps(data, indent=2))
         except Exception:
             print(result)
-
-    finally:
-        driver.quit()
 
 
 def main():
