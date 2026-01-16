@@ -28,8 +28,6 @@ select = [
     "SIM",
     # isort
     "I",
-	# async
-	"ASYNC",
 	# ruff-specific
 	"RUF",
 ]
