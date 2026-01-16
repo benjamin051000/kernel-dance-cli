@@ -1,20 +1,50 @@
 import json
 import sys
+from contextlib import contextmanager
+from pathlib import Path
 
 from selenium import webdriver
-from selenium.common import TimeoutException
-from selenium.webdriver.chrome.options import Options
+from selenium.common import SessionNotCreatedException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 __all__ = ["scrape_kernel_dance"]
 
 
-def scrape_kernel_dance(commit: str) -> str:
-    options = Options()
-    options.add_argument("--headless")
+@contextmanager
+def pick_webdriver():
+    """Choose a webdriver based on the ones your system has installed."""
+    try:
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(options=chrome_options)
+    except SessionNotCreatedException:
+        # Chrome not available. Try Firefox
+        try:
+            # On Ubuntu, firefox is usually installed as a snap...
+            if Path("/snap/bin/geckodriver").exists():
+                service = webdriver.FirefoxService(
+                    executable_path="/snap/bin/geckodriver"
+                )
+            else:
+                # But sometimes as a deb.
+                service = None
 
-    with webdriver.Chrome(options=options) as driver:
+            ff_options = webdriver.FirefoxOptions()
+            ff_options.add_argument("--headless")
+            driver = webdriver.Firefox(options=ff_options, service=service)
+
+        except SessionNotCreatedException:
+            print("Well, you need to install a webdriver.", file=sys.stderr)
+            sys.exit(1)
+
+    yield driver
+
+    driver.quit()
+
+
+def scrape_kernel_dance(commit: str) -> str:
+    with pick_webdriver() as driver:
         url = f"https://kernel.dance/#{commit}"
         driver.get(url)
 
