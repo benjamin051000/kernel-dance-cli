@@ -1,13 +1,23 @@
 [project]
-name = "kernel-dance"
+name = "kernel-dance-cli"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Benjamin Wheeler", email = "benjaminwheeler0510@gmail.com" }
+]
 requires-python = ">=3.13"
 dependencies = [
     "aiohttp>=3.12.15",
     "selenium>=4.39.0",
 ]
+
+[project.scripts]
+kernel-dance-cli = "kernel_dance_cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
