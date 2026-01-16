@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-def scrape_kernel_dance(commit):
+def scrape_kernel_dance(commit: str) -> str:
     options = Options()
     options.add_argument("--headless")
 
@@ -21,21 +21,14 @@ def scrape_kernel_dance(commit):
             in ["done", "error"]
         )
 
-        # Get the output
         output = driver.find_element(By.ID, "output")
         result = output.text
 
-        # Check if error
         if driver.find_element(By.TAG_NAME, "body").get_attribute("class") == "error":
             print(f"Error: {result}", file=sys.stderr)
             sys.exit(1)
 
-        # Try to parse and pretty-print JSON
-        try:
-            data = json.loads(result)
-            print(json.dumps(data, indent=2))
-        except Exception:
-            print(result)
+    return result
 
 
 def main():
@@ -44,7 +37,14 @@ def main():
         sys.exit(1)
 
     commit = sys.argv[1]
-    scrape_kernel_dance(commit)
+    result = scrape_kernel_dance(commit)
+
+    try:
+        data = json.loads(result)
+    except json.JSONDecodeError:
+        print(result)
+    else:
+        print(json.dumps(data, indent=2))
 
 
 if __name__ == "__main__":
