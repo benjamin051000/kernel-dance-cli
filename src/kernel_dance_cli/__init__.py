@@ -7,6 +7,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
+__all__ = ["scrape_kernel_dance"]
+
 
 def scrape_kernel_dance(commit: str) -> str:
     options = Options()
