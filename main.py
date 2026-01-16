@@ -10,8 +10,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 def scrape_kernel_dance(commit):
     options = Options()
     options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
 
     with webdriver.Chrome(options=options) as driver:
         url = f"https://kernel.dance/#{commit}"
